@@ -19,9 +19,13 @@ cd /Users/joe/kafka_2.13-2.6.0
 kafka-server-start config/server.properties
 
 # E. KAFKA CONNECT
-# 1. navigate to 'kafka-connect' folder
+# 1. modify these properties in balance.properties (do not commit it while you are making pull request)
+input.path=/Users/joe/Documents/ANDROID/idea/AnomalyDetection/kafka-connect/data
+finished.path=/Users/joe/Documents/ANDROID/idea/AnomalyDetection/kafka-connect/processed
+error.path=/Users/joe/Documents/ANDROID/idea/AnomalyDetection/kafka-connect/error
+# 2. navigate to 'kafka-connect' folder
 cd /path/to/project/AnomalyDetection/kafka-connect
-# 2. create stream from csv file
+# 3. create stream from csv file
 connect-standalone connect-standalone.properties balance.properties
 
 # D. CONSUMER

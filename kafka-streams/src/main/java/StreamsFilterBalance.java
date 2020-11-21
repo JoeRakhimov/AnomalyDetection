@@ -5,8 +5,6 @@ import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.KStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,8 +16,6 @@ public class StreamsFilterBalance {
     private static Map<String, Double> balanceMap = new HashMap<>();
 
     public static void main(String[] args) {
-
-        final Logger logger = LoggerFactory.getLogger(StreamsFilterBalance.class.getName());
 
         // create properties
         Properties properties = new Properties();
