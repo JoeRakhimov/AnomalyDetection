@@ -13,7 +13,7 @@ import java.util.Properties;
 public class StreamsFilterBalance {
 
     private static JsonParser jsonParser = new JsonParser();
-    private static Map<String, Double> balanceMap = new HashMap<>();
+    private static Map<String, Account> accounts = new HashMap<>();
 
     public static void main(String[] args) {
 
@@ -36,21 +36,22 @@ public class StreamsFilterBalance {
                             .getAsJsonObject()
                             .get("payload")
                             .getAsJsonObject();
-                    String giroNumber = payload.get("GIRONUMBER").getAsString();
-                    double amount = Double.parseDouble(payload.get("AMOUNT").getAsString());
-                    String currency = payload.get("CURRENCY").getAsString();
 
-                    if (balanceMap.containsKey(giroNumber)) {
-                        double previousAmount = balanceMap.get(giroNumber);
-                        double difference = amount - previousAmount;
-                        double anomalyLimit = getAnomalyLimit(currency);
-                        boolean anomalyFound = (-1 * difference) > anomalyLimit;
-                        balanceMap.put(giroNumber, amount);
-                        return anomalyFound;
+                    Account account = Account.createNewAccountFromJson(payload);
+                    String key = account.getGiroNumber();
+                    boolean anomalyFound = false;
+
+                    if (accounts.containsKey(key)) {
+                        Account oldAccount = accounts.get(key);
+                        anomalyFound = account.searchAnomalyInCurrentAccountTimeStamp() ||
+                                       Account.searchAnomalyInBalance(account,oldAccount) ||
+                                       Account.searchAnomalyInAccountSequenceByDate(account,oldAccount) ||
+                                       oldAccount.searchPatternInExpenses(account);
+                        oldAccount.refresh(account);
                     } else {
-                        balanceMap.put(giroNumber, amount);
-                        return false;
+                        accounts.put(key, account);
                     }
+                    return anomalyFound;
 
                 }
         );
@@ -62,35 +63,6 @@ public class StreamsFilterBalance {
         // start our streams application
         kafkaStreams.start();
 
-    }
-
-    private static double getAnomalyLimit(String currency) {
-        switch (currency) {
-            case "HUF":
-                return 300_000;
-            case "USD":
-                return 1_000;
-            case "EUR":
-                return 1_000;
-            case "GBP":
-                return 1_000;
-            case "RON":
-                return 4_000;
-            case "PLN":
-                return 4_000;
-            case "CZK":
-                return 20_000;
-            case "RSD":
-                return 100_000;
-            case "BGN":
-                return 1_000;
-            case "HRK":
-                return 6_000;
-            case "SEK":
-                return 8_000;
-            default:
-                return 1_000;
-        }
     }
 
 }
