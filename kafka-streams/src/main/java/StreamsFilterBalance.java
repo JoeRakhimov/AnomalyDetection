@@ -39,15 +39,19 @@ public class StreamsFilterBalance {
 
                     Account account = Account.createNewAccountFromJson(payload);
                     String key = account.getGiroNumber();
+                    boolean anomalyFound = false;
 
                     if (accounts.containsKey(key)) {
                         Account oldAccount = accounts.get(key);
+                        anomalyFound = account.searchAnomalyInCurrentAccountTimeStamp() ||
+                                       Account.searchAnomalyInBalance(account,oldAccount) ||
+                                       Account.searchAnomalyInAccountSequenceByDate(account,oldAccount) ||
+                                       oldAccount.searchPatternInExpenses(account);
                         oldAccount.refresh(account);
-                        return Account.searchAnomalyInBalance(account,oldAccount);
                     } else {
                         accounts.put(key, account);
-                        return false;
                     }
+                    return anomalyFound;
 
                 }
         );
