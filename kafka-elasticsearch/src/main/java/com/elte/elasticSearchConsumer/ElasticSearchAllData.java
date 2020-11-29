@@ -93,7 +93,6 @@ public class ElasticSearchAllData {
         RestHighLevelClient client = createClient();
 
         KafkaConsumer<String, String> consumer = createConsumer("balance_topic");
-        KafkaConsumer<String, String> consumer2 = createConsumer("filtered_balance_topic");
 
         while (true) {
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
