@@ -14,12 +14,18 @@
 # /balance
 # click button 'RUN'
 # this creates index 'balance'
+# /twitter
+# click button 'RUN'
+# this creates index 'twitter'
 
 # 4. Set ElasticSearchAllData.java's esConfigFile variable to absolute path to elasticsearch.properties file in your computer
 # 5. Run ElasticSearchAllData.java main() function
 
 # 6. # 4. Set ElasticSearchAllData.java's esConfigFile variable to absolute path to elasticsearch.properties file in your computer
 # 7. Run ElasticSearchFilterData.java main() function
+
+# 8. # 4. Set ElasticSearchTwitter.java's esConfigFile variable to absolute path to elasticsearch.properties file in your computer
+# 9. Run ElasticSearchTwitter.java main() function
 
 
 
