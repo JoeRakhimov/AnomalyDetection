@@ -17,6 +17,7 @@
     <modules>
         <module>kafka-connect</module>
         <module>kafka-streams</module>
+        <module>kafka-elasticsearch</module>
     </modules>
 
 </project>

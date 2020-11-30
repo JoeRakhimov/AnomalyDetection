@@ -1,5 +1,3 @@
-package com.elte.elasticSearchConsumer;
-
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -10,7 +8,6 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
@@ -30,12 +27,11 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Properties;
 
-public class ElasticSearchFilterData {
-
+public class ElasticSearchAllData {
     public static RestHighLevelClient createClient(){
 
         Properties esConfig = new Properties();
-        String esConfigFile = "C:\\Users\\suchi\\IdeaProjects\\OSTproject\\AnomalyDetection\\kafka-elasticsearch\\src\\main\\java\\com\\elte\\elasticSearchConsumer\\elasticsearch.properties";
+        String esConfigFile = "/Users/joe/Documents/ANDROID/idea/AnomalyDetection/kafka-elasticsearch/elasticsearch.properties";
         InputStream is = null;
         try {
             is = new FileInputStream(esConfigFile);
@@ -71,7 +67,7 @@ public class ElasticSearchFilterData {
 
     public static KafkaConsumer<String, String> createConsumer(String topic){
         String bootstrapServers = "127.0.0.1:9092";
-        String groupId = "es-filtered-balance";
+        String groupId = "es-all-balance";
 
         //create producer properties
         Properties properties = new Properties();
@@ -91,10 +87,10 @@ public class ElasticSearchFilterData {
 
     public static void main(String[] args) throws IOException {
 
-        Logger logger = LoggerFactory.getLogger(ElasticSearchFilterData.class.getName());
+        Logger logger = LoggerFactory.getLogger(ElasticSearchAllData.class.getName());
         RestHighLevelClient client = createClient();
 
-        KafkaConsumer<String, String> consumer = createConsumer("filtered_balance_topic");
+        KafkaConsumer<String, String> consumer = createConsumer("balance_topic");
 
         while (true) {
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
@@ -102,7 +98,7 @@ public class ElasticSearchFilterData {
             for (ConsumerRecord<String, String> record : records) {
 
                 IndexRequest indexRequest = new IndexRequest(
-                        "filtered_balance",
+                        "balance",
                         "_doc"
                 ).source(record.value(), XContentType.JSON);
 
@@ -115,8 +111,8 @@ public class ElasticSearchFilterData {
                     e.printStackTrace();
                 }
             }
-
         }
         //client.close();
     }
+
 }
