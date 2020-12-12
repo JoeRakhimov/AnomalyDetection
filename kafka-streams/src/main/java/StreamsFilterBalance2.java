@@ -115,7 +115,6 @@ public class StreamsFilterBalance2 {
         try (BufferedReader br = new BufferedReader(new FileReader(exchangeRateCsvFilePath))) {
             String line;
             String[] keys = null;
-            boolean firstLine = false;
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
                 if (keys == null) {
