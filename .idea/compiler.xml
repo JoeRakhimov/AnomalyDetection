@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="kafka-streams" />
         <module name="kafka-connect" />
+        <module name="kafka-elasticsearch" />
       </profile>
     </annotationProcessing>
   </component>
