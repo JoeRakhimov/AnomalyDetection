@@ -31,7 +31,8 @@ public class ElasticSearchAllData {
     public static RestHighLevelClient createClient(){
 
         Properties esConfig = new Properties();
-        String esConfigFile = "/Users/joe/Documents/ANDROID/idea/AnomalyDetection/kafka-elasticsearch/elasticsearch.properties";
+        String esConfigFile = "C:\\Users\\suchi\\IdeaProjects\\OSTproject\\AnomalyDetection\\kafka-elasticsearch\\src\\main\\java\\com\\elte\\elasticSearchConsumer\\elasticsearch.properties";
+        //String esConfigFile = "/Users/joe/Documents/ANDROID/idea/AnomalyDetection/kafka-elasticsearch/elasticsearch.properties";
         InputStream is = null;
         try {
             is = new FileInputStream(esConfigFile);
@@ -53,7 +54,7 @@ public class ElasticSearchAllData {
                 new UsernamePasswordCredentials(username, password));
 
         RestClientBuilder builder = RestClient.builder(
-                new HttpHost(hostname, 443, "https"))
+                new HttpHost(hostname, 9200, "http"))
                 .setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
                     @Override
                     public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpAsyncClientBuilder) {
@@ -89,14 +90,12 @@ public class ElasticSearchAllData {
 
         Logger logger = LoggerFactory.getLogger(ElasticSearchAllData.class.getName());
         RestHighLevelClient client = createClient();
-
-        KafkaConsumer<String, String> consumer = createConsumer("balance_topic");
+        KafkaConsumer<String, String> consumer = createConsumer("balance-wAnomaly");
 
         while (true) {
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
 
             for (ConsumerRecord<String, String> record : records) {
-
                 IndexRequest indexRequest = new IndexRequest(
                         "balance",
                         "_doc"
