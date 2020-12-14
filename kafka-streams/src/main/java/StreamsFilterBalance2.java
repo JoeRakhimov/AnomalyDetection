@@ -20,7 +20,7 @@ public class StreamsFilterBalance2 {
     private static JsonParser jsonParser = new JsonParser();
     private static Map<String, Account> accounts = new HashMap<>();
     private static Map<String, HashMap<String, Double>> exchangeRates = new HashMap<>();
-    private static String exchangeRateCsvFilePath = "/Users/joe/Documents/ANDROID/idea/AnomalyDetection/kafka-connect/exchange.csv";
+    private static String exchangeRateCsvFilePath = "C:\\Users\\suchi\\IdeaProjects\\OSTproject\\AnomalyDetection\\kafka-connect\\exchange.csv";
 
     public static void main(String[] args) throws IOException {
 
@@ -38,7 +38,7 @@ public class StreamsFilterBalance2 {
         StreamsBuilder streamsBuilder = new StreamsBuilder();
 
         // input topic
-        KStream<String, String> inputTopic = streamsBuilder.stream("balance_topic");
+        KStream<String, String> inputTopic = streamsBuilder.stream("balance_topic_v2");
 
         KStream<String, String> updatedStream = inputTopic.mapValues(new ValueMapper<String, String>() {
             @Override
@@ -64,43 +64,59 @@ public class StreamsFilterBalance2 {
                     if (exchangeRates.keySet().contains(sdf.format(date))) {
                         Double rate = exchangeRates.get(sdf.format(date)).get(currency);
                         Double amount = Double.parseDouble(jsonObject.get("payload").getAsJsonObject().get("AMOUNT").getAsString());
+                        //Date valid_from = CustomDateFormatter.getDateFormat(jsonObject.get("payload").getAsJsonObject().get("VALID_FROM").getAsString());
                         amount = amount / rate;
-                        jsonObject.get("payload").getAsJsonObject().addProperty("AMOUNT", amount);
-                        jsonObject.get("payload").getAsJsonObject().addProperty("CURRENCY", "EUR");
+                        jsonObject.get("payload").getAsJsonObject().addProperty("AMOUNT_EUR", amount);
+                        //jsonObject.get("payload").getAsJsonObject().addProperty("VALID_FROM2", valid_from);
                     }
+                }
+                else{
+                    Double amount = Double.parseDouble(jsonObject.get("payload").getAsJsonObject().get("AMOUNT").getAsString());
+                    jsonObject.get("payload").getAsJsonObject().addProperty("AMOUNT_EUR", amount);
                 }
                 String result = new Gson().toJson(jsonObject);
                 return result;
             }
         });
 
-        KStream<String, String> filteredStream = updatedStream.filter(
-                (k, jsonValue) -> {
+        KStream<String, String> anomalyStream = updatedStream.mapValues(new ValueMapper<String, String>() {
+            @Override
+            public String apply(String jsonValue) {
+                JsonObject jsonObject = jsonParser.parse(jsonValue).getAsJsonObject();
+                JsonObject payload = jsonObject.get("payload").getAsJsonObject();
 
-                    JsonObject payload = jsonParser.parse(jsonValue)
-                            .getAsJsonObject()
-                            .get("payload")
-                            .getAsJsonObject();
+                Account account = Account.createNewAccountFromJson(payload);
+                String key = account.getGiroNumber();
+                boolean anomalyFound = false;
+                String anomalyType = "";
 
-                    Account account = Account.createNewAccountFromJson(payload);
-                    String key = account.getGiroNumber();
-                    boolean anomalyFound = false;
-
-                    if (accounts.containsKey(key)) {
-                        Account oldAccount = accounts.get(key);
-                        anomalyFound = account.searchAnomalyInCurrentAccountTimeStamp() ||
-                                Account.searchAnomalyInBalance(account, oldAccount) ||
-                                Account.searchAnomalyInAccountSequenceByDate(account, oldAccount) ||
-                                oldAccount.searchPatternInExpenses(account);
-                        oldAccount.refresh(account);
-                    } else {
-                        accounts.put(key, account);
+                if (accounts.containsKey(key)) {
+                    Account oldAccount = accounts.get(key);
+                    if (account.searchAnomalyInCurrentAccountTimeStamp()) {
+                        anomalyFound = true;
+                        anomalyType = "Timestamp";
+                    } else if (Account.searchAnomalyInBalance(account, oldAccount)) {
+                        anomalyFound = true;
+                        anomalyType = "Balance";
+                    } else if (Account.searchAnomalyInAccountSequenceByDate(account, oldAccount)) {
+                        anomalyFound = true;
+                        anomalyType = "AccountSeq";
+                    } else if (oldAccount.searchPatternInExpenses(account)) {
+                        anomalyFound = true;
+                        anomalyType = "ExpensePattern";
                     }
-                    return anomalyFound;
-
+                }else {
+                    accounts.put(key, account);
                 }
-        );
-        filteredStream.to("filtered_balance_topic");
+                jsonObject.get("payload").getAsJsonObject().addProperty("ANOMALY", anomalyFound);
+                jsonObject.get("payload").getAsJsonObject().addProperty("ANOMALY_TYPE", anomalyType);
+
+                String result = new Gson().toJson(jsonObject);
+                return result;
+            }
+        });
+
+        anomalyStream.to("balance-wAnomaly");
 
         // build topology
         KafkaStreams kafkaStreams = new KafkaStreams(streamsBuilder.build(), properties);
