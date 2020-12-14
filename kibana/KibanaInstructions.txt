@@ -1,0 +1,19 @@
+Kibana console codes:
+Once you have ElasticSearch and Kibana up and running in your system, go to below address to add, delete, list indices
+http://localhost:5601/app/dev_tools#/console
+
+To get list of indices:
+GET /_cat/indices?v
+
+To add an index:
+PUT /balance
+
+To delete an index:
+DELETE /balance
+
+iFrame codes of visualization snapshots created in Kibana:
+AvgAmount_TimeSeries
+<iframe src="http://localhost:5601/app/visualize#/edit/f2022690-3e38-11eb-a93b-dbed3a8cb255?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-15m,to:now))&_a=(filters:!(),linked:!t,query:(language:kuery,query:''),uiState:(),vis:(aggs:!((enabled:!t,id:'2',params:(customLabel:'AvgAmount%20(in%20EUR)',field:payload.AMOUNT_EUR),schema:metric,type:avg),(enabled:!t,id:'3',params:(field:payload.VALID_FROM.keyword,missingBucket:!f,missingBucketLabel:Missing,order:desc,orderBy:_key,otherBucket:!f,otherBucketLabel:Other,size:189),schema:segment,type:terms),(enabled:!t,id:'4',params:(field:payload.ANOMALY,missingBucket:!f,missingBucketLabel:Missing,order:desc,orderBy:_key,otherBucket:!f,otherBucketLabel:Other,size:500),schema:group,type:terms)),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,categoryAxes:!((id:CategoryAxis-1,labels:(filter:!t,show:!t,truncate:10),position:bottom,scale:(type:linear),show:!t,style:(),title:(),type:category)),grid:(categoryLines:!f),labels:(),legendPosition:right,seriesParams:!((data:(id:'2',label:'AvgAmount%20(in%20EUR)'),drawLinesBetweenPoints:!t,interpolate:linear,lineWidth:2,mode:normal,show:!t,showCircles:!t,type:line,valueAxis:ValueAxis-1)),thresholdLine:(color:%23E7664C,show:!f,style:full,value:10,width:1),times:!(),type:line,valueAxes:!((id:ValueAxis-1,labels:(filter:!f,rotate:0,show:!t,truncate:100),name:LeftAxis-1,position:left,scale:(mode:normal,type:linear),show:!t,style:(),title:(text:'AvgAmount%20(in%20EUR)'),type:value))),title:AvgAmount_TimeSeries,type:line))" height="600" width="800"></iframe>
+
+TimeSerier_AnomalyType
+<iframe src="http://localhost:5601/app/visualize#/edit/d50bb610-3e37-11eb-a93b-dbed3a8cb255?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-15m,to:now))&_a=(filters:!(),linked:!t,query:(language:kuery,query:''),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Number%20of%20Transactions'),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:Time,field:payload.VALID_FROM.keyword,missingBucket:!f,missingBucketLabel:Missing,order:desc,orderBy:_key,otherBucket:!f,otherBucketLabel:Other,size:100),schema:segment,type:terms),(enabled:!t,id:'3',params:(field:payload.ANOMALY_TYPE.keyword,missingBucket:!f,missingBucketLabel:Missing,order:desc,orderBy:'1',otherBucket:!f,otherBucketLabel:Other,size:5),schema:group,type:terms)),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,categoryAxes:!((id:CategoryAxis-1,labels:(filter:!t,show:!t,truncate:100),position:bottom,scale:(type:linear),show:!t,style:(),title:(),type:category)),grid:(categoryLines:!f),labels:(),legendPosition:right,seriesParams:!((data:(id:'1',label:'Number%20of%20Transactions'),drawLinesBetweenPoints:!t,interpolate:linear,lineWidth:2,mode:normal,show:!t,showCircles:!t,type:line,valueAxis:ValueAxis-1)),thresholdLine:(color:%23E7664C,show:!f,style:full,value:10,width:1),times:!(),type:line,valueAxes:!((id:ValueAxis-1,labels:(filter:!f,rotate:0,show:!t,truncate:100),name:LeftAxis-1,position:left,scale:(mode:normal,type:linear),show:!t,style:(),title:(text:'Number%20of%20Transactions'),type:value))),title:TimeSerier_AnomalyType,type:line))" height="600" width="800"></iframe>
