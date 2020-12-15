@@ -2,7 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 
-\title{Anomaly detection in financial data}
+\title{Anomaly Detection In Financial Data}
 \author{Anar Sultani, Daniel Grimm, Gayrat Rakhimov,\\ Zhang Yinghong, Suchith Shetty}
 \date{December 2020}
 
@@ -18,7 +18,7 @@ This project is implementation of anomaly detection on financial data.
 
 2 data sets are used:
 \begin{itemize}
-    \item balance\_hist\_anon.csv - account balance states for certain time periods. It contains 6427316 rows of data.
+    \item balance\_hist\_anon.csv - account balance states for certain time periods. It contains 6,427,316 rows of data.
     It contains 6 columns:
     \begin{enumerate}
     \item EBIZ\_BALANCE\_ID - unique id for each account balance state
@@ -65,6 +65,10 @@ Jupyter Notebook was used to understand balance data and rename first column to 
 
 Initially 'eurofxref-hist.csv' contains exchange rates for 42 currencies from 04.01.1999 till 09.12.2020. According to balance data, only exchange rates for 10 currencies from 02.01.2017 till 09.12.2020 is used. It is important to note that this data set does not contain exchange rates RSD (Serbian dinar).
 
+\subsubsection{Kafka Producer to read csv data}
+
+KafkaProducer.ipynb has the python code to load data from 'balance.csv' to a Kafka topic. Each row is read as a json object using the underlying schema. This was implemented as a first use case to explore use of python for loading data. We then moved on to one of the more sophisticated methods, i.e., Kafka Connect using SpoolDir.
+
 \subsection{Kafka Connect}
 
 Kafka Connect connector called Spool Dir was used to read 'balance.csv' into the stream 'balance\_topic'. It reads CSV file and converts into JSON format according to the given schema. JSON data is sent to 'balance\_topic'. Batch size is 1000 per batch.
@@ -79,11 +83,27 @@ Exchange rates data is read from 'exchange.csv' into HashMap. It is used to upda
 
 First filtering is made on account balance difference. For this purpose, previous balance amount is persisted by account number. When next account balance state is received, difference is calculated and if the difference is more than predefined limit, it is considered as anomalous. For example, previous balance for the account is 5000 EUR and the current balance is 3000 EUR, the difference is 2000 EUR and it is more than 1000 EUR. This is considered as anomalous and sent to 'filtered\_balance\_topic'.
 
+\subsubsection{Identifying Anomaly}
+
+Original stream data from 'balance.csv' being loaded into a kafka topic named 'balance\_topic' was analysed using multiple stream transformations to identify anomaly. Two new fields, 'ANOMALY' and 'ANOMALY\_TYPE', were added during the transformation to indicate whether the record was anomalous or not, and if yes, then what kind of anomaly was detected. Transformed stream was subsequently loaded to ElasticSearch hosted locally and visualized using Kibana. 
+
+\subsection{ElasticSearch and Kibana}
+
+On the consumer side of the pipeline, we chose to use ElasticSearch as the database and Kibana for visualization. Kafka consumer module was written to stream the transformed data with information on anomaly to ElasticSearch. Kibana console was used to create, monitor and delete ElasticSearch indices, explore data loaded to ElasticSearch, and create dashboard to visualize the anomaly detection results.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{Dashboard_snapshot.PNG}
+\caption{Snapshot of dashboard created in Kibana}
+\label{fig:OuptutDashboard}
+\end{figure}
+
+
 \section{Experiments}
 
 \subsection{Merging 2 streams}
 
-It was tried to merge the balance data and currency exchange data streams into one using Kafka Streams. However, during the implementation of this idea, several problems were faced. For example, the way how to synchronize daily exchange rates with balance data on the given date was not found. Primitive merging of two streams caused the following problem: the balance data is received before exchange rate data for specific day and balance data could not be updated. For this reason, exchange rate data was read directly from file without creating stream.
+It was tried to merge the balance data and currency exchange data streams into one using Kafka Streams. However, during the implementation of this idea, several problems were faced. For example, the way how to synchronize daily exchange rates with balance data on the given date was not found. Primitive merging of two streams caused the following problem: the balance data is received before exchange rate data for specific day and balance data could not be updated. For this reason, exchange rate data was read directly from file without creating stream. 
 
 \subsection{Twitter API}
 
@@ -91,8 +111,7 @@ It was tried to use Twitter tweets feed to help find anomalies on balance data. 
 
 \subsection{Remote ElasticSearch server}
 
-Twitter all tweets and filtered tweets are stored in remote ElasticSearch server called Bonsai. It was found out that it is convenient way to set up ElasticSearch server in short time. However, according to the project requirements balance data should not be stored in third party storage and that's why it was decided to use ElasticSearch on personal computer. 
-
+Twitter all tweets and filtered tweets are stored in remote ElasticSearch server called Bonsai. It was found out that it is convenient way to set up ElasticSearch server in short time. However, according to the project requirements balance data should not be stored in third party storage. Further, only upto 10k records can be loaded to ElasticSearch database hosted in Bonsai under the free version. Due to these limitations, it was decided to use ElasticSearch and Kibana servers hosted locally on our personal computers. 
 \section{Description of duties performed by project team members}
 
 \subsection{Anar Sultani}
@@ -126,9 +145,18 @@ Twitter all tweets and filtered tweets are stored in remote ElasticSearch server
 
 \subsection{Zhang Yinghong}
 
-\subsection{Suchith Shetty}
+\subsection{Suchith Shetty (HIUH69}
+\begin{itemize}
+    \item Initial exploration of shared data to understand the fields and get some summary statistics
+    \item Kafka producer module to load data from csv to Kafka topic using Python
+    \item Setting up ElasticSearch and Kibana on a third-party host (Bonsai) and in local machine
+    \item Kafka consumer module to stream data from Kafka to Elastic Search
+    \item Explore, create visualization charts and compile them to create output dashboard in Kibana
+    \item Contribute in stream transformations for anomaly detection and data engineering to make output streams compatible for easy visualization
+    \item Contribute in report writing and preparing presentation material
+\end{itemize}
 
-\section{References}
+%\section{References}
 
 \begin{thebibliography}{9}
 
