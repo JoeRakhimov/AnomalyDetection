@@ -71,9 +71,16 @@ KafkaProducer.ipynb has the python code to load data from 'balance.csv' to a Kaf
 
 \subsection{Kafka Connect}
 
+\subsubsection{Why Apache Kafka?}
+
+We have decided to use Apache Kafka, because according to Shree et al.(2017), it is "fast, scalable, distributed stream processing platform and fault tolerant messaging system." It is designed for low latency and high throughput\cite{shree}.
+
+\subsubsection{The connector}
 Kafka Connect connector called Spool Dir was used to read 'balance.csv' into the stream 'balance\_topic'. It reads CSV file and converts into JSON format according to the given schema. JSON data is sent to 'balance\_topic'. Batch size is 1000 per batch.
 
 \subsection{Kafka Streams}
+
+According to Bejeck (2018), "Kafka Streams is a library that allows you to perform per-event processing of records". Data is processed as it is available.
 
 \subsubsection{Merging balance data with exchange rates data}
 
@@ -85,7 +92,7 @@ First filtering is made on account balance difference. For this purpose, previou
 
 \subsubsection{Identifying Anomaly}
 
-Original stream data from 'balance.csv' being loaded into a kafka topic named 'balance\_topic' was analysed using multiple stream transformations to identify anomaly. Two new fields, 'ANOMALY' and 'ANOMALY\_TYPE', were added during the transformation to indicate whether the record was anomalous or not, and if yes, then what kind of anomaly was detected. Transformed stream was subsequently loaded to ElasticSearch hosted locally and visualized using Kibana. 
+Original stream data from 'balance.csv' being loaded into a kafka topic named 'balance\_topic' was analysed using multiple stream transformations to identify anomaly. Two new fields, 'ANOMALY' and 'ANOMALY\_TYPE', were added during the transformation to indicate whether the record was anomalous or not, and if yes, then what kind of anomaly was detected. Transformed stream was subsequently loaded to ElasticSearch hosted locally and visualized using Kibana.
 
 \subsection{ElasticSearch and Kibana}
 
@@ -103,7 +110,7 @@ On the consumer side of the pipeline, we chose to use ElasticSearch as the datab
 
 \subsection{Merging 2 streams}
 
-It was tried to merge the balance data and currency exchange data streams into one using Kafka Streams. However, during the implementation of this idea, several problems were faced. For example, the way how to synchronize daily exchange rates with balance data on the given date was not found. Primitive merging of two streams caused the following problem: the balance data is received before exchange rate data for specific day and balance data could not be updated. For this reason, exchange rate data was read directly from file without creating stream. 
+It was tried to merge the balance data and currency exchange data streams into one using Kafka Streams. However, during the implementation of this idea, several problems were faced. For example, the way how to synchronize daily exchange rates with balance data on the given date was not found. Primitive merging of two streams caused the following problem: the balance data is received before exchange rate data for specific day and balance data could not be updated. For this reason, exchange rate data was read directly from file without creating stream.
 
 \subsection{Twitter API}
 
@@ -111,12 +118,10 @@ It was tried to use Twitter tweets feed to help find anomalies on balance data. 
 
 \subsection{Remote ElasticSearch server}
 
-Twitter all tweets and filtered tweets are stored in remote ElasticSearch server called Bonsai. It was found out that it is convenient way to set up ElasticSearch server in short time. However, according to the project requirements balance data should not be stored in third party storage. Further, only upto 10k records can be loaded to ElasticSearch database hosted in Bonsai under the free version. Due to these limitations, it was decided to use ElasticSearch and Kibana servers hosted locally on our personal computers. 
+Twitter all tweets and filtered tweets are stored in remote ElasticSearch server called Bonsai. It was found out that it is convenient way to set up ElasticSearch server in short time. However, according to the project requirements balance data should not be stored in third party storage. Further, only upto 10k records can be loaded to ElasticSearch database hosted in Bonsai under the free version. Due to these limitations, it was decided to use ElasticSearch and Kibana servers hosted locally on our personal computers.
 \section{Description of duties performed by project team members}
 
-\subsection{Anar Sultani}
-
-\subsection{Daniel Grimm}
+\subsection{Daniel Grimm (BU44BJ)}
 
 \begin{itemize}
     \item Configuring and setting up Docker containers for Elasticsearch and Kibana
@@ -124,28 +129,27 @@ Twitter all tweets and filtered tweets are stored in remote ElasticSearch server
     \item Parsing data from balance.csv
     \item Creating multiple anomaly detector functions
     \item Creating kibana visualizations
-    \item Code  repository  management  on  Github: reviewing and creating pull requests 
+    \item Code  repository  management  on  Github: reviewing and creating pull requests
     \item Participating in project team’s meetings
 \end{itemize}
 
-\subsection{Gayrat Rakhimov}
+\subsection{Gayrat Rakhimov (IGMQ0T)}
 
 \begin{itemize}
-    \item data preprocessing on Jupyter Notebook: modifying balance and exchange rates data
-    \item setting up Kafka Connect to read balance data into 'balance\_topic' stream
-    \item reading Twitter tweets feed from Twitter API
-    \item merging balance data and exchange data
-    \item filtering balance data according to balance differences
-    \item setting up remote ElasticSearch server and storing Tweeter tweets there
-    \item code repository management on Github: creating repository, reviewing pull requests and access management
-    \item participating in project team's meetings
-    \item writing report
-    \item preparing presentation material
+    \item Data preprocessing on Jupyter Notebook: modifying balance and exchange rates data
+    \item Setting up Kafka Connect to read balance data into 'balance\_topic' stream
+    \item Reading Twitter tweets feed from Twitter API
+    \item Merging balance data and exchange data
+    \item Filtering balance data according to balance differences
+    \item Setting up remote ElasticSearch on a third-party host (Bonsai)
+    \item Storing Twitter data on ElasticSearch
+    \item Code repository management on Github: creating repository, reviewing pull requests and access management
+    \item Participating in project team's meetings
+    \item Writing report
+    \item Preparing presentation material
 \end{itemize}
 
-\subsection{Zhang Yinghong}
-
-\subsection{Suchith Shetty (HIUH69}
+\subsection{Suchith Shetty (HIUH69)}
 \begin{itemize}
     \item Initial exploration of shared data to understand the fields and get some summary statistics
     \item Kafka producer module to load data from csv to Kafka topic using Python
@@ -160,8 +164,14 @@ Twitter all tweets and filtered tweets are stored in remote ElasticSearch server
 
 \begin{thebibliography}{9}
 
-\bibitem{ecb} 
+\bibitem{ecb}
 European Central Bank. (2020). Euro Foreign Exchange Reference Rates. \url{www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.zip?53a6f7cba144c040b7a2a4a8242d1431}.
+
+\bibitem{shree}
+Shree, R., Choudhury, T., Gupta, S. and Kumar, P., (2017). KAFKA: The modern platform for data management and analysis in big data domain. 2017 2nd International Conference on Telecommunication and Networks (TEL-NET), 1. \url{https://ieeexplore.ieee.org/abstract/document/8343593/}
+
+\bibitem{Bejeck}
+Bejeck, B. (2018). Kafka Streams in Action: Real-time apps and microservices with the Kafka Streams API (1st ed.). Manning Publications.
 
 \end{thebibliography}
 
