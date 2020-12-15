@@ -65,8 +65,12 @@ public class StreamsFilterBalance2 {
                         Double rate = exchangeRates.get(sdf.format(date)).get(currency);
                         Double amount = Double.parseDouble(jsonObject.get("payload").getAsJsonObject().get("AMOUNT").getAsString());
                         //Date valid_from = CustomDateFormatter.getDateFormat(jsonObject.get("payload").getAsJsonObject().get("VALID_FROM").getAsString());
-                        amount = amount / rate;
-                        jsonObject.get("payload").getAsJsonObject().addProperty("AMOUNT_EUR", amount);
+                        if (rate == null) {
+                            jsonObject.get("payload").getAsJsonObject().addProperty("AMOUNT_EUR", 0);
+                        } else {
+                            amount = amount / rate;
+                            jsonObject.get("payload").getAsJsonObject().addProperty("AMOUNT_EUR", amount);
+                        }
                         //jsonObject.get("payload").getAsJsonObject().addProperty("VALID_FROM2", valid_from);
                     }
                 }
