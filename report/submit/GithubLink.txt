@@ -1,0 +1,2 @@
+Link for Github repository:
+https://github.com/JoeRakhimov/AnomalyDetection
