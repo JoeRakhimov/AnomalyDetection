@@ -96,7 +96,7 @@ Original stream data from 'balance.csv' being loaded into a kafka topic named 'b
 
 \subsection{ElasticSearch and Kibana}
 
-On the consumer side of the pipeline, we chose to use ElasticSearch as the database and Kibana for visualization. Kafka consumer module was written to stream the transformed data with information on anomaly to ElasticSearch. Kibana console was used to create, monitor and delete ElasticSearch indices, explore data loaded to ElasticSearch, and create dashboard to visualize the anomaly detection results.
+On the consumer side of the pipeline, we chose to use ElasticSearch as the database and Kibana for visualization. ElasticSearch is easily configurable and can overcome issues in real-time data analysis which is otherwise challenging in other NoSQL or relational database services[4]. Kafka consumer module was written to stream the transformed data with information on anomaly to ElasticSearch. Kibana console was used to create, monitor and delete ElasticSearch indices, explore data loaded to ElasticSearch, and create dashboard to visualize the anomaly detection results.
 
 \begin{figure}[h!]
 \centering
@@ -172,6 +172,9 @@ Shree, R., Choudhury, T., Gupta, S. and Kumar, P., (2017). KAFKA: The modern pla
 
 \bibitem{Bejeck}
 Bejeck, B. (2018). Kafka Streams in Action: Real-time apps and microservices with the Kafka Streams API (1st ed.). Manning Publications.
+
+\bibitem{Shah}
+Shah, N., Willick, D. & Mago, V. A framework for social media data analytics using Elasticsearch and Kibana. Wireless Netw (2018). \url{https://doi.org/10.1007/s11276-018-01896-2}
 
 \end{thebibliography}
 
