@@ -20,7 +20,7 @@ public class StreamsFilterBalance2 {
 
     private static JsonParser jsonParser = new JsonParser();
     private static Map<String, Account> accounts = new HashMap<>();
-    private static Map<String, Account> last100accs = new HashMap<>();
+//    private static Map<String, Account> last100accs = new HashMap<>();
     private static Map<String, HashMap<String, Double>> exchangeRates = new HashMap<>();
     private static String exchangeRateCsvFilePath = "C:\\Users\\suchi\\IdeaProjects\\OSTproject\\AnomalyDetection\\kafka-connect\\exchange.csv";
 
@@ -98,14 +98,17 @@ public class StreamsFilterBalance2 {
 
 
                 if (accounts.containsKey(key)) {
-                    List<Double> last100 = getLast100Trxns(accounts, 1000);
+                    Integer windowSize = 10;
+                    Integer zscoreThresh = 2;
+                    List<Double> lastN = getLastNTrxns(accounts, windowSize);
+                    //System.out.println(lastN);
                     Account oldAccount = accounts.get(key);
-                    if (last100.size() == 1000){
-                        Double last100mean = MathMethods.mean(last100);
-                        Double last100stddev = MathMethods.stddev(last100);
-                        anomalyFound = Account.zscoreOutlier(account, last100mean, last100stddev);
+                    if (lastN.size() == windowSize){
+                        Double lastWindowMean = MathMethods.mean(lastN);
+                        Double lastWindowStdDev = MathMethods.stddev(lastN);
+                        anomalyFound = Account.zscoreOutlier(account, lastWindowMean, lastWindowStdDev,zscoreThresh);
                         anomalyType = "zscoreOutlier";
-                        //if(anomalyFound) System.out.println(anomalyFound);
+                        if(anomalyFound) System.out.println(anomalyFound);
                     }else if (account.searchAnomalyInCurrentAccountTimeStamp()) {
                         anomalyFound = true;
                         anomalyType = "Timestamp";
@@ -140,9 +143,10 @@ public class StreamsFilterBalance2 {
 
     }
 
-    protected static List<Double> getLast100Trxns(Map<String, Account> accounts, int x) {
+    protected static List<Double> getLastNTrxns(Map<String, Account> accounts, int N) {
         return accounts.entrySet().stream()
-                .limit(x)
+                //.sorted(Comparator.<Map.Entry<String, Account>, Double> comparing(Map.Entry::getValue).reversed())
+                .limit(N)
                 .map(Map.Entry::getValue)
                 .map(e -> e.getBalance())
                 .collect(Collectors.toList());

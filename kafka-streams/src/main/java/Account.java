@@ -63,11 +63,11 @@ public class Account {
         return anomaly;
     }
 
-    public static boolean zscoreOutlier(Account account, Double last100mean, Double last100stddev) {
+    public static boolean zscoreOutlier(Account account, Double lastWindowMean, Double lastWindowStdDev, Integer thresh) {
         boolean anomaly = false;
-        double zscore = (account.balanceInEur - last100mean)/last100stddev;
+        double zscore = (account.balanceInEur - lastWindowMean)/lastWindowStdDev;
         //System.out.println(zscore);
-        if (Math.abs(zscore) > 2) { // Predefined threshold
+        if (Math.abs(zscore) > thresh) { // Predefined threshold
             anomaly = true;
         }
         return anomaly;
