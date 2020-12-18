@@ -90,6 +90,10 @@ Exchange rates data is read from 'exchange.csv' into HashMap. It is used to upda
 
 First filtering is made on account balance difference. For this purpose, previous balance amount is persisted by account number. When next account balance state is received, difference is calculated and if the difference is more than predefined limit, it is considered as anomalous. For example, previous balance for the account is 5000 EUR and the current balance is 3000 EUR, the difference is 2000 EUR and it is more than 1000 EUR. This is considered as anomalous and sent to 'filtered\_balance\_topic'.
 
+\subsubsection{Additional ways to filter balance data}
+
+We also detect anomalies for every unique customers in the following way: we measure the mean of the previous spendings, and if the unseen data is deviating very strongly from it then we mark it as anomaly. Since data is coming line line by line, the average is recalculated every time when a new data is arriving. There is a predefined threshold for deciding whether we mark the data as anomaly or not. Also we are measuring the differences between the dates, thus we don't allow a transaction after not using the account for one year, or in case of invalid date data. 
+
 \subsubsection{Identifying Anomaly}
 
 Original stream data from 'balance.csv' being loaded into a kafka topic named 'balance\_topic' was analysed using multiple stream transformations to identify anomaly. Two new fields, 'ANOMALY' and 'ANOMALY\_TYPE', were added during the transformation to indicate whether the record was anomalous or not, and if yes, then what kind of anomaly was detected. Transformed stream was subsequently loaded to ElasticSearch hosted locally and visualized using Kibana.
@@ -119,6 +123,11 @@ It was tried to use Twitter tweets feed to help find anomalies on balance data. 
 \subsection{Remote ElasticSearch server}
 
 Twitter all tweets and filtered tweets are stored in remote ElasticSearch server called Bonsai. It was found out that it is convenient way to set up ElasticSearch server in short time. However, according to the project requirements balance data should not be stored in third party storage. Further, only upto 10k records can be loaded to ElasticSearch database hosted in Bonsai under the free version. Due to these limitations, it was decided to use ElasticSearch and Kibana servers hosted locally on our personal computers.
+
+\subsection{Docker containers}
+
+Docker provides lightweight virtualization technology, which can be useful if we just want to run applications in separated environments. We don't need to virtualize a whole OS which could be very resource demanding. We decided to use docker containers for Elasticsearch and Kibana. After configuring the ports, we can use them in a very effective way since we don't need to use online solutions like Bonsai. It can be useful also when lot of people are working on the code, since it is very easy to share environments, and set them up. At the end everyone will have the same environment, which makes development a lot easier.
+
 \section{Description of duties performed by project team members}
 
 \subsection{Daniel Grimm (BU44BJ)}
