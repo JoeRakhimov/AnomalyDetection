@@ -86,6 +86,13 @@ According to Bejeck (2018), "Kafka Streams is a library that allows you to perfo
 
 Exchange rates data is read from 'exchange.csv' into HashMap. It is used to update balance data from 'balance\_topic'. For example, when exchange rate is 1 EUR=1.1 USD and account balance 1100 USD is replaced by 1000 EUR.
 
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{rates.PNG}
+\caption{Merging balance data with exchange rates data}
+\label{fig:OuptutDashboard}
+\end{figure}
+
 \subsubsection{Filtering balance data}
 
 First filtering is made on account balance difference. For this purpose, previous balance amount is persisted by account number. When next account balance state is received, difference is calculated and if the difference is more than predefined limit, it is considered as anomalous. For example, previous balance for the account is 5000 EUR and the current balance is 3000 EUR, the difference is 2000 EUR and it is more than 1000 EUR. This is considered as anomalous and sent to 'filtered\_balance\_topic'.
