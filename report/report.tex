@@ -3,7 +3,7 @@
 \usepackage{graphicx}
 
 \title{Anomaly Detection In Financial Data}
-\author{Anar Sultani, Daniel Grimm, Gayrat Rakhimov,\\ Zhang Yinghong, Suchith Shetty}
+\author{Daniel Grimm, Gayrat Rakhimov, Suchith Shetty}
 \date{December 2020}
 
 \begin{document}
@@ -86,13 +86,20 @@ According to Bejeck (2018), "Kafka Streams is a library that allows you to perfo
 
 Exchange rates data is read from 'exchange.csv' into HashMap. It is used to update balance data from 'balance\_topic'. For example, when exchange rate is 1 EUR=1.1 USD and account balance 1100 USD is replaced by 1000 EUR.
 
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{rates.PNG}
+\caption{Merging balance data with exchange rates data}
+\label{fig:OuptutDashboard}
+\end{figure}
+
 \subsubsection{Filtering balance data}
 
 First filtering is made on account balance difference. For this purpose, previous balance amount is persisted by account number. When next account balance state is received, difference is calculated and if the difference is more than predefined limit, it is considered as anomalous. For example, previous balance for the account is 5000 EUR and the current balance is 3000 EUR, the difference is 2000 EUR and it is more than 1000 EUR. This is considered as anomalous and sent to 'filtered\_balance\_topic'.
 
 \subsubsection{Additional ways to filter balance data}
 
-We also detect anomalies for every unique customers in the following way: we measure the mean of the previous spendings, and if the unseen data is deviating very strongly from it then we mark it as anomaly. Since data is coming line line by line, the average is recalculated every time when a new data is arriving. There is a predefined threshold for deciding whether we mark the data as anomaly or not. Also we are measuring the differences between the dates, thus we don't allow a transaction after not using the account for one year, or in case of invalid date data. 
+We also detect anomalies for every unique customers in the following way: we measure the mean of the previous spendings, and if the unseen data is deviating very strongly from it then we mark it as anomaly. Since data is coming line line by line, the average is recalculated every time when a new data is arriving. There is a predefined threshold for deciding whether we mark the data as anomaly or not. Also we are measuring the differences between the dates, thus we don't allow a transaction after not using the account for one year, or in case of invalid date data.
 
 \subsubsection{Identifying Anomaly}
 
@@ -128,49 +135,16 @@ Twitter all tweets and filtered tweets are stored in remote ElasticSearch server
 
 Docker provides lightweight virtualization technology, which can be useful if we just want to run applications in separated environments. We don't need to virtualize a whole OS which could be very resource demanding. We decided to use docker containers for Elasticsearch and Kibana. After configuring the ports, we can use them in a very effective way since we don't need to use online solutions like Bonsai. It can be useful also when lot of people are working on the code, since it is very easy to share environments, and set them up. At the end everyone will have the same environment, which makes development a lot easier.
 
-\section{Description of duties performed by project team members}
-
-\subsection{Daniel Grimm (BU44BJ)}
-
-\begin{itemize}
-    \item Configuring and setting up Docker containers for Elasticsearch and Kibana
-    \item Connecting pipeline: local installation + docker
-    \item Parsing data from balance.csv
-    \item Creating multiple anomaly detector functions
-    \item Creating kibana visualizations
-    \item Code  repository  management  on  Github: reviewing and creating pull requests
-    \item Participating in project team’s meetings
-\end{itemize}
-
-\subsection{Gayrat Rakhimov (IGMQ0T)}
-
-\begin{itemize}
-    \item Data preprocessing on Jupyter Notebook: modifying balance and exchange rates data
-    \item Setting up Kafka Connect to read balance data into 'balance\_topic' stream
-    \item Reading Twitter tweets feed from Twitter API
-    \item Merging balance data and exchange data
-    \item Filtering balance data according to balance differences
-    \item Setting up remote ElasticSearch on a third-party host (Bonsai)
-    \item Storing Twitter data on ElasticSearch
-    \item Code repository management on Github: creating repository, reviewing pull requests and access management
-    \item Participating in project team's meetings
-    \item Writing report
-    \item Preparing presentation material
-\end{itemize}
-
-\subsection{Suchith Shetty (HIUH69)}
-\begin{itemize}
-    \item Initial exploration of shared data to understand the fields and get some summary statistics
-    \item Kafka producer module to load data from csv to Kafka topic using Python
-    \item Setting up ElasticSearch and Kibana on a third-party host (Bonsai) and in local machine
-    \item Kafka consumer module to stream data from Kafka to Elastic Search
-    \item Explore, create visualization charts and compile them to create output dashboard in Kibana
-    \item Contribute in stream transformations for anomaly detection and data engineering to make output streams compatible for easy visualization
-    \item Contribute in report writing and preparing presentation material
-\end{itemize}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{Docker_snapshot.jpg}
+\caption{Workflow with Docker containers}
+\label{fig:OuptutDashboard}
+\end{figure}
 
 %\section{References}
 
+\newpage
 \begin{thebibliography}{9}
 
 \bibitem{ecb}
@@ -183,7 +157,13 @@ Shree, R., Choudhury, T., Gupta, S. and Kumar, P., (2017). KAFKA: The modern pla
 Bejeck, B. (2018). Kafka Streams in Action: Real-time apps and microservices with the Kafka Streams API (1st ed.). Manning Publications.
 
 \bibitem{Shah}
-Shah, N., Willick, D. & Mago, V. A framework for social media data analytics using Elasticsearch and Kibana. Wireless Netw (2018). \url{https://doi.org/10.1007/s11276-018-01896-2}
+Shah, N., Willick, D. & Mago, V. (2018). A framework for social media data analytics using Elasticsearch and Kibana. Wireless Netw. \url{https://doi.org/10.1007/s11276-018-01896-2}
+
+\bibitem{shafi}
+Shafi (2018). Docker, Elasticsearch and Kibana (part 1) \url{https://medium.com/@s\_tokhi/docker-elasticsearch-and-kibana-c76808ea3ab8}
+
+\bibitem{rahasak}
+Rahasak, Λ. (2020). Kafka and Zookeeper with Docker. https://medium.com/rahasak/kafka-and-zookeeper-with-docker-65cff2c2c34f
 
 \end{thebibliography}
 

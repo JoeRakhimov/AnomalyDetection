@@ -22,7 +22,7 @@ public class StreamsFilterBalance2 {
     private static Map<String, Account> accounts = new HashMap<>();
 //    private static Map<String, Account> last100accs = new HashMap<>();
     private static Map<String, HashMap<String, Double>> exchangeRates = new HashMap<>();
-    private static String exchangeRateCsvFilePath = "C:\\Users\\suchi\\IdeaProjects\\OSTproject\\AnomalyDetection\\kafka-connect\\exchange.csv";
+    private static String exchangeRateCsvFilePath = "/Users/joe/Documents/ANDROID/idea/AnomalyDetection/kafka-connect/exchange.csv";
 
     public static void main(String[] args) throws IOException {
 
