@@ -90,12 +90,22 @@ Exchange rates data is read from 'exchange.csv' into HashMap. It is used to upda
 \centering
 \includegraphics[width=\textwidth]{rates.PNG}
 \caption{Merging balance data with exchange rates data}
-\label{fig:OuptutDashboard}
+\label{fig:ExchangeRateMerge}
 \end{figure}
 
 \subsubsection{Filtering balance data}
 
 First filtering is made on account balance difference. For this purpose, previous balance amount is persisted by account number. When next account balance state is received, difference is calculated and if the difference is more than predefined limit, it is considered as anomalous. For example, previous balance for the account is 5000 EUR and the current balance is 3000 EUR, the difference is 2000 EUR and it is more than 1000 EUR. This is considered as anomalous and sent to 'filtered\_balance\_topic'.
+
+\subsubsection{Z-score based anomaly on a rolling window}
+
+One of the methods used to determine if a new record flowing into the stream is anomalous or not is the z-score based outlier detection. For every new record entering the stream, the z-score of the balance amount compared to the previous 1000 records is determined. For this purpose, a rolling window of 1000 records is maintained, and the mean and the standard deviation of the records in the window is saved for the 'BALANCE\_IN\_EUR' field. 
+Z-score for a data-point in a distribution with mean $\mu$ and standard deviation $\sigma$ is given by the formula:
+\begin{equation}
+    ZS(x) = \frac{x-\mu}{\sigma}
+\end{equation}
+
+If the z-score of the new record on the 'BALANCE\_IN\_EUR' field comes out to be more than a threshold value of 3, then the record is marked as potentially anomalous. This is based on the assumption that the transactions follow a normal or a Gaussian distribution and the records that have a absolute z-score of 3 or more implies that it is more than 3 standard deviations away from the mean of the distribution and is likely to be anomalous (In a normal distribution, ~99\% of the records fall within 3$\sigma$ from the mean)
 
 \subsubsection{Additional ways to filter balance data}
 
@@ -104,6 +114,7 @@ We also detect anomalies for every unique customers in the following way: we mea
 \subsubsection{Identifying Anomaly}
 
 Original stream data from 'balance.csv' being loaded into a kafka topic named 'balance\_topic' was analysed using multiple stream transformations to identify anomaly. Two new fields, 'ANOMALY' and 'ANOMALY\_TYPE', were added during the transformation to indicate whether the record was anomalous or not, and if yes, then what kind of anomaly was detected. Transformed stream was subsequently loaded to ElasticSearch hosted locally and visualized using Kibana.
+
 
 \subsection{ElasticSearch and Kibana}
 
@@ -116,6 +127,21 @@ On the consumer side of the pipeline, we chose to use ElasticSearch as the datab
 \label{fig:OuptutDashboard}
 \end{figure}
 
+\section{Execution Steps}
+The overall pipeline of the project can be summarized in following steps:
+\begin{itemize}
+    \item Start the Zookeeper server (usually in port 2181)
+    \item Start the Kafka server (usually in port 9092)
+    \item create a kafka topic to load the csv data using the kafka-topics command. Choose number of partitions and replication factor accordingly. (In our project, replication-factor was set to 1 since Kafka server was hosted locally with a single broker)
+    \item use Kafka Connect to load csv file to the kafka topic created earlier using the SpoolDir connector
+    \item created another kafka topic to load the transformed and processed stream
+    \item execute the kafka stream processing code that includes the exchange rate information and performs transformations to identify anomalous data records
+    \item start ElasticSearch server (usually on port 9200)
+    \item start Kibana server (usually on port 5601)
+    \item create index using Kibana console to load the data to be visualized
+    \item execute kafka consumer module to load processed stream to ElasticSearch within the created index
+    \item Open the kibana dashboard and set the refresh rate to required frequency and monitor the output. 
+\end{itemize}
 
 \section{Experiments}
 
@@ -126,6 +152,10 @@ It was tried to merge the balance data and currency exchange data streams into o
 \subsection{Twitter API}
 
 It was tried to use Twitter tweets feed to help find anomalies on balance data. For example, tweets with keyword "HUF/USD", "HUF/EUR", "Economy of Hungary". However, the meaningful use case of tweets feeds was not found and it was decided to not to use them.
+
+\subsection{Kafka Producer in python}
+
+As a parallel method to read data from csv file to kafka topic, a kafka producer module was written in Python using the kafka-python package. Since a more sophisticated approach to load csv file with underlying schema definition using Kafka connect was figured out, this other approached
 
 \subsection{Remote ElasticSearch server}
 
