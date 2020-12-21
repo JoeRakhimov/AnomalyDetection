@@ -1,5 +1,7 @@
 import com.google.gson.JsonObject;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class Account {
@@ -57,6 +59,16 @@ public class Account {
         if (difference < 0) { // only for withdraws
             double deviation = Math.pow(difference - Math.abs(averageOfExpenses),2);
             if (deviation > Math.abs(averageOfExpenses) + 0.5 * getAnomalyLimit(currency)) anomaly = true; // Predefined threshold
+        }
+        return anomaly;
+    }
+
+    public static boolean zscoreOutlier(Account account, Double lastWindowMean, Double lastWindowStdDev, Integer thresh) {
+        boolean anomaly = false;
+        double zscore = (account.balanceInEur - lastWindowMean)/lastWindowStdDev;
+        //System.out.println(zscore);
+        if (Math.abs(zscore) > thresh) { // Predefined threshold
+            anomaly = true;
         }
         return anomaly;
     }

@@ -31,8 +31,7 @@ public class ElasticSearchAllData {
     public static RestHighLevelClient createClient(){
 
         Properties esConfig = new Properties();
-        String esConfigFile = "C:\\Users\\suchi\\IdeaProjects\\OSTproject\\AnomalyDetection\\kafka-elasticsearch\\src\\main\\java\\com\\elte\\elasticSearchConsumer\\elasticsearch.properties";
-        //String esConfigFile = "/Users/joe/Documents/ANDROID/idea/AnomalyDetection/kafka-elasticsearch/elasticsearch.properties";
+        String esConfigFile = "/Users/joe/Documents/ANDROID/idea/AnomalyDetection/kafka-elasticsearch/elasticsearch.properties";
         InputStream is = null;
         try {
             is = new FileInputStream(esConfigFile);
