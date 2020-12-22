@@ -172,6 +172,14 @@ Docker provides lightweight virtualization technology, which can be useful if we
 \label{fig:OuptutDashboard}
 \end{figure}
 
+\subsubsection{Setting up Docker environment}
+
+The first step is to find the required docker images on $https://hub.docker.com$. In our case the following images were used: $docker.elastic.co/elasticsearch/elasticsearch:7.10.1$ and $docker.elastic.co/kibana/kibana:7.10.1$. After getting these images by the $docker\ run$ command, we can start to set up the environment. Two different approaches are available, we can use commands in terminal, or we can create dockerfile, which is a special yaml file, which contains instructions about our image configuration. In the second case we just need to use this file. In our project we used the first approach: first we started the elasticsearch container with the following command: $docker\ run\ -d\ --rm\ -p\ 9200:9200\ -p\ 9300:9300\ -e\ "discovery.type=single-node"\ --name\ elasticsearch docker.elastic.co/elasticsearch/elasticsearch:7.10.1$. This command starts elasticsearch on localhost, port 9200, so we can easily connect. The second command $docker\ run\ -d\ --rm\ -p\ 5601:5601\ -e\ "discovery.type=single-node"\ --name\ kibana\ --link\ 
+elasticsearch\ docker.elastic.co/kibana/kibana:7.10.1$ starts kibana on localhost, port 5601, and links itself to the elasticsearch image. From this point the development can continue in a normal way.
+
+\subsubsection{Problems which we encountered with Docker}
+
+While kafka, and zookeeper don't have official images, it is still possible to use them, since there are some third party solutions which can be found on Github. In our case the problem was that we could not connect them with our spooldir connector.
 %\section{References}
 
 \newpage
